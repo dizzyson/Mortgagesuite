@@ -1,0 +1,55 @@
+/* =====================================================================
+   v6 — styling for the elements patch-v6.js injects
+
+   The one that actually matters here is `.dz`. patch-docs.js renders its
+   dropzone with `class="dz"` and there is no rule for it anywhere in the
+   file — it has been an unstyled bare div this whole time, which was
+   survivable while it was click-only, but a drop target with no border
+   and no drag state reads as broken. Styled to match the engine's own
+   `.dropzone`, including the `.drag` state v6 toggles.
+   ===================================================================== */
+
+/* --- the Contract & LE dropzone (previously unstyled entirely) --- */
+#panel-docparse .dz{
+  border:2px dashed var(--line-2, #2a3142);
+  border-radius:14px;
+  background:var(--surface-2, rgba(125,135,165,.05));
+  padding:22px 16px;
+  text-align:center;
+  cursor:pointer;
+  transition:border-color .12s, background .12s, transform .12s;
+}
+#panel-docparse .dz:hover{
+  border-color:var(--accent, #4C56D6);
+  background:var(--accent-soft, rgba(76,86,214,.07));
+}
+#panel-docparse .dz.drag{
+  border-color:var(--accent, #4C56D6);
+  background:var(--accent-soft, rgba(76,86,214,.07));
+  transform:scale(1.005);
+}
+#panel-docparse .dz .cap{
+  font-size:10.5px; text-transform:uppercase; letter-spacing:.07em;
+  font-weight:700; color:var(--muted, #8a93a8);
+}
+
+/* --- Comparison section --- */
+.v6-compare-card{ margin-top:14px; }
+.v6-compare-card .card-top .btn-icon{
+  font-size:16px; font-weight:700; line-height:1; min-width:22px;
+}
+.v6-cmpzone{ cursor:pointer; }
+.v6-cmpzone.drag{ transform:scale(1.005); }
+
+/* The comparison table gets the same tabular-figure treatment the rest
+   of the file uses for money, so columns line up digit for digit. */
+.v6-compare-card table.tbl td.num,
+.v6-compare-card table.tbl th.num{
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+
+/* --- draft Schedule C print button, inline in the card header --- */
+.v6-printsch{ opacity:.75; }
+.v6-printsch:hover{ opacity:1; }
