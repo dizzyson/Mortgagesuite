@@ -48,6 +48,10 @@ function shell(title, body){
    + '.draft{position:fixed;top:38%;left:10%;font-size:110px;color:rgba(220,60,80,.13);'
    + 'transform:rotate(-24deg);font-weight:800;pointer-events:none;z-index:0}'
    + '.pagebreak{page-break-before:always}'
+   /* Schedule C form layout — must live here, not in patch-v7.css: the
+      print window is a fresh document and does not inherit the page's
+      stylesheet. */
+   + '.schc{ border:1.5px solid #12161f; margin-bottom:10px; } .schc-hd{ display:flex; border-bottom:1.5px solid #12161f; } .schc-hd-l{ width:130px; padding:5px 7px; border-right:1px solid #12161f; } .schc-hd-c{ flex:1; padding:5px 7px; text-align:center; } .schc-hd-r{ width:110px; padding:5px 7px; border-left:1px solid #12161f; text-align:center; } .schc-form{ font-size:13px; font-weight:800; line-height:1.15; } .schc-form span{ font-size:9.5px; font-weight:600; } .schc-t{ font-size:16px; font-weight:800; letter-spacing:-.01em; } .schc-s{ font-size:9px; color:#5A6379; } .schc-s2{ font-size:8.5px; color:#8A93A8; margin-top:2px; font-style:italic; } .schc-yr{ font-size:19px; font-weight:800; color:rgba(220,60,80,.5); letter-spacing:.06em; } .schc-name{ width:100%; border-collapse:collapse; } .schc-name td{ border-bottom:1px solid #12161f; border-right:1px solid #12161f; padding:4px 7px; font-size:11px; vertical-align:top; } .schc-name td:last-child{ border-right:none; } .schc-name .cap{ font-size:8px; text-transform:uppercase; letter-spacing:.05em; color:#8A93A8; } .schc-part{ background:#12161f; color:#fff; font-size:11px; font-weight:800; padding:3px 7px; letter-spacing:.02em; } .schc-tbl{ width:100%; border-collapse:collapse; } .schc-tbl th, .schc-tbl td{ border-bottom:1px solid #D6DBE6; padding:2.5px 7px; font-size:10.5px; } .schc-tbl th.amt{ font-size:9px; text-transform:uppercase; letter-spacing:.05em; color:#8A93A8; text-align:right; border-bottom:1px solid #12161f; } .schc-tbl td.ln{ width:26px; font-weight:800; font-size:9.5px; color:#5A6379; border-right:1px solid #D6DBE6; text-align:center; } .schc-tbl td.lbl{ color:#12161f; } .schc-tbl td.amt, .schc-tbl th.amt{ width:88px; text-align:right; font-variant-numeric:tabular-nums; border-left:1px solid #D6DBE6; background:#FAFBFD; } .schc-tbl tr.tot td{ font-weight:800; border-top:1.5px solid #12161f; border-bottom:1.5px solid #12161f; background:#F3F5FB; }'
    + '</style></head><body>' + body + '</body></html>';
 }
 function rows(list, cls){
@@ -121,16 +125,23 @@ function printDraftSchC(id){
   var p = schCPayload(b), r = p.r;
   if (!r) return say('Nothing to print', 'The Schedule C calculation is not available yet \u2014 try again once the worksheet has finished loading.', 'warn');
   var SL = G('SCHC_LINES') || [];
+  /* v7 renders the 1040 Schedule C layout — numbered lines, the boxed
+     amount column, Part I / Part II. Fall back to the plain table if v7
+     isn't loaded, so this file still works standalone. */
+  var formBlock = (window.V7 && V7.schCFormHTML)
+    ? V7.schCFormHTML(b, r, p.borrower, p.dateStr)
+    : ('<h2>' + esc(b.name || 'Business') + '</h2>');
   var body = '<div class="draft">DRAFT</div>'
+   + formBlock
+   + '<div class="pagebreak"></div><div class="draft">DRAFT</div>'
    + '<div class="hd"><div><h1>Schedule C Income Analysis</h1>'
-   + '<div class="sub">Self-employment income worksheet (Fannie Mae Form 1084 methodology) \u2014 not the filed tax return</div></div>'
+   + '<div class="sub">Fannie Mae Form 1084 methodology \u2014 the figures that drive qualifying income</div></div>'
    + '<div style="text-align:right"><span class="badge">' + esc(p.borrower) + '</span>'
    + '<div class="sub" style="margin:5px 0 0">Prepared ' + p.dateStr + '</div></div></div>'
-   + '<h2>' + esc(b.name || 'Business') + '</h2>'
-   + '<table><thead><tr><th>Line item</th><th class="n">' + esc(String(b.y1.yr)) + '</th><th class="n">' + esc(String(b.y2.yr)) + '</th></tr></thead><tbody>'
+   + '<table><thead><tr><th>Adjustment</th><th class="n">' + esc(String(b.y1.yr)) + '</th><th class="n">' + esc(String(b.y2.yr)) + '</th></tr></thead><tbody>'
    + SL.map(function(L){
        var v1 = N(b.y1[L.k]), v2 = N(b.y2[L.k]);
-       var f = function(v){ return L.sign === 0 ? v.toLocaleString() + ' mi' : usd((L.sign<0?-1:1)*v*(L.sign===0?1:1),2); };
+       var f = function(v){ return L.sign === 0 ? v.toLocaleString() + ' mi' : usd((L.sign<0?-1:1)*v,2); };
        return '<tr><td>' + esc(L.label.replace(/&amp;/g,'&')) + ' <span style="color:#8A93A8">(' + esc(L.cite) + ')</span></td>'
          + '<td class="n">' + f(v1) + '</td><td class="n">' + f(v2) + '</td></tr>';
      }).join('')

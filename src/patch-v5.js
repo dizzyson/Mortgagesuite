@@ -525,24 +525,33 @@ function augmentRail(){
     /* MI rate, next to the MI dollar line */
     var lines = $$('.out', rail);
     var miLine = lines.filter(function(l){ var lab = l.querySelector('.l'); return lab && /mortgage insurance/i.test(lab.textContent); })[0];
-    if (miLine && !miLine.querySelector('.v5-mirate')){
+    if (miLine){
+      /* The engine publishes the rate it actually used — fhaMipRateUsed /
+         pmiRateUsed, both fractions, both already reflecting any override.
+         Reading those beats back-computing from the monthly figure (which
+         is rounded to the cent) and beats reading the raw input field
+         (which is the pre-override rate, so an overridden file would have
+         displayed a rate it wasn't charging). */
       var isFha = !!out.isFha;
-      var rate = isFha ? N(st.activeInputs && st.activeInputs.fhaAnnualMipRate) : null;
-      var pmiRate = null;
-      if (!isFha && out.payment && N(out.payment.monthlyPmi) > 0){
-        var loanAmt = N(out.loan && (out.loan.maximumBaseLoan || out.loan.totalLoan));
-        if (loanAmt > 0) pmiRate = (N(out.payment.monthlyPmi) * 12 / loanAmt) * 100;
-      }
-      var shown = isFha ? (isFinite(rate) ? (rate*100).toFixed(2) + '% MIP' : '')
-                         : (pmiRate != null ? pmiRate.toFixed(2) + '% PMI' : '');
-      if (shown){
-        var tag = document.createElement('span');
-        tag.className = 'v5-mirate'; tag.textContent = shown;
+      var pay = out.payment || {};
+      var rate = isFha ? N(pay.fhaMipRateUsed) : N(pay.pmiRateUsed);
+      var shown = rate > 0 ? (rate*100).toFixed(2) + '% ' + (isFha ? 'MIP' : 'PMI') : '';
+      var tag = miLine.querySelector('.v5-mirate');
+      if (shown && !tag){
+        tag = document.createElement('span');
+        tag.className = 'v5-mirate';
         var v = miLine.querySelector('.v'); if (v) v.parentNode.insertBefore(tag, v);
       }
+      /* Repaint every pass, not once — the rate moves with LTV and FICO
+         and a write-once tag would have frozen at its first value. */
+      if (tag) tag.textContent = shown;
     }
   });
 }
+
+/* Exposed so later layers can force an immediate rail repaint after a
+   change instead of waiting up to half a second for the poll. */
+V5.paintRail = augmentRail;
 
 /* =================================================================== 11
    SCENARIO NAMING — restore "Lastname · Program · down% · rate · MM-DD"

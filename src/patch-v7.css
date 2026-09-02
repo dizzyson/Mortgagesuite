@@ -1,0 +1,71 @@
+/* =====================================================================
+   v7 — styling
+   ===================================================================== */
+
+/* --- 1. the clipped Load / More menus -------------------------------
+   patch.css raised the calculator tab bar to z-index 60. The toolbar
+   holding Income Report / Load / Save sits at 55, and a dropdown cannot
+   paint above its own parent's stacking context, so the top of the menu
+   — including "Load income file (.json)" — was hidden behind the tabs.
+   The toolbar goes above the tab bar; the menu goes above everything in
+   the calculator shell.                                                */
+.toolbar{ z-index:80 !important; }
+#calc-root nav.tabbar{ z-index:55 !important; }
+.menu{ z-index:400 !important; }
+
+/* --- 2. free-form lock extension dates ----------------------------- */
+.v7-datewrap{ position:relative; display:flex; align-items:center; }
+.v7-datewrap .v7-dateinput{ flex:1; min-width:0; padding-right:30px; }
+.v7-datewrap .v7-datepick{
+  position:absolute; right:4px; width:22px; border:none; background:transparent;
+  color:var(--muted, #8a93a8); cursor:pointer; padding:0;
+}
+.v7-datewrap .v7-datepick::-webkit-calendar-picker-indicator{ cursor:pointer; opacity:.65; }
+.v7-datewrap .v7-datepick::-webkit-datetime-edit,
+.v7-datewrap .v7-datepick::-webkit-inner-spin-field{ display:none; }
+
+/* --- 3. capacity card on the rail ---------------------------------- */
+.v7-cap{
+  margin-top:12px; padding-top:11px;
+  border-top:1px solid var(--line-2, #2a3142);
+}
+.v7-cap-head{
+  font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.7px;
+  color:var(--accent, #4C56D6); margin-bottom:7px;
+}
+.v7-cap-row{
+  display:flex; align-items:baseline; justify-content:space-between; gap:8px;
+  margin-top:9px;
+}
+.v7-cap-row .l{ font-size:12px; color:var(--text, #c3cde0); }
+.v7-cap-row .v{
+  font-size:14px; font-weight:800; font-variant-numeric:tabular-nums;
+  color:var(--text-strong, #e8edf7); white-space:nowrap;
+}
+.v7-cap-sub{
+  font-size:10.5px; color:var(--muted, #8a93a8);
+  font-variant-numeric:tabular-nums; margin-top:1px;
+}
+.v7-verdict{
+  display:inline-block; margin-top:4px; padding:2px 7px; border-radius:5px;
+  font-size:10px; font-weight:800; letter-spacing:.03em;
+}
+.v7-verdict span{ font-weight:600; opacity:.75; }
+.v7-verdict.under{ background:rgba(31,157,85,.13); color:#1f9d55; }
+.v7-verdict.over{ background:rgba(192,57,43,.13); color:#c0392b; }
+.v7-cap-note{
+  font-size:10px; line-height:1.5; color:var(--muted, #8a93a8);
+  margin-top:9px; padding-top:8px; border-top:1px dotted var(--line-2, #2a3142);
+}
+.v7-cap-cush{ display:flex; align-items:center; gap:7px; margin-top:8px; }
+.v7-cap-cush label{
+  font-size:10px; text-transform:uppercase; letter-spacing:.06em; font-weight:700;
+  color:var(--muted, #8a93a8);
+}
+.v7-cap-cush input{ width:66px; }
+
+/* --- 4. draft Schedule C ------------------------------------------
+   The form layout lives in patch-v6.js's shell(), not here: the print
+   helper opens a blank window and writes a fresh document, which does
+   not inherit this stylesheet. Rules placed here would silently do
+   nothing.                                                            */

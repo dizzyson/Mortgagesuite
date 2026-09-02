@@ -79,7 +79,8 @@ def main():
     css = (PATCH_DIR / "patch.css").read_text(encoding="utf-8") \
         + "\n\n" + (PATCH_DIR / "patch-reno.css").read_text(encoding="utf-8") \
         + "\n\n" + (PATCH_DIR / "patch-v5.css").read_text(encoding="utf-8") \
-        + "\n\n" + (PATCH_DIR / "patch-v6.css").read_text(encoding="utf-8")
+        + "\n\n" + (PATCH_DIR / "patch-v6.css").read_text(encoding="utf-8") \
+        + "\n\n" + (PATCH_DIR / "patch-v7.css").read_text(encoding="utf-8")
     js  = (PATCH_DIR / "patch.js").read_text(encoding="utf-8") \
         + "\n\n" + (PATCH_DIR / "patch-va.js").read_text(encoding="utf-8") \
         + "\n\n" + (PATCH_DIR / "patch-v2.js").read_text(encoding="utf-8") \
@@ -87,7 +88,8 @@ def main():
         + "\n\n" + (PATCH_DIR / "patch-v3.js").read_text(encoding="utf-8") \
         + "\n\n" + (PATCH_DIR / "patch-v4.js").read_text(encoding="utf-8") \
         + "\n\n" + (PATCH_DIR / "patch-v5.js").read_text(encoding="utf-8") \
-        + "\n\n" + (PATCH_DIR / "patch-v6.js").read_text(encoding="utf-8")
+        + "\n\n" + (PATCH_DIR / "patch-v6.js").read_text(encoding="utf-8") \
+        + "\n\n" + (PATCH_DIR / "patch-v7.js").read_text(encoding="utf-8")
 
     # 2. stylesheet, last thing in <head>
     if "</head>" not in html:
